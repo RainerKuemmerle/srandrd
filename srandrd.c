@@ -345,6 +345,7 @@ process_events(Display * dpy, int verbose)
 {
 	XRRScreenResources *sr;
 	XRROutputInfo *info;
+	XRRModeInfo *mode;
 	XEvent ev;
 	char edid[EDID_SIZE], screenid[SCREENID_SIZE];
 	int i, edidlen;
@@ -372,7 +373,20 @@ process_events(Display * dpy, int verbose)
 				continue;
 			}
 
+			for (i = 0; i < sr->nmode; i++) {
+				if (sr->modes[i].id == OCNE(&ev)->mode) {
+					mode = &sr->modes[i];
+					break;
+				}
+			}
+
 			if (strncmp(CON_EVENTS[info->connection], "disconnected", 12) == 0) {
+				if (mode == NULL && !(OCNE(&ev)->mode)) {
+					fprintf(stderr, "Ignoring disconnected event with no mode\n");
+					XRRFreeScreenResources(sr);
+					XRRFreeOutputInfo(info);
+					continue;
+				}
 				/* retrieve edid and screen information from cache */
 				OutputConnection *ocon = get_output_connection(CONNECTIONS, OCNE(&ev)->output);
 				if (ocon) {
@@ -383,6 +397,13 @@ process_events(Display * dpy, int verbose)
 				}
 			}
 			else {
+				if (mode || OCNE(&ev)->mode) {
+					fprintf(stderr, "Ignoring connected event with mode\n");
+					XRRFreeScreenResources(sr);
+					XRRFreeOutputInfo(info);
+					mode = NULL;
+					continue;
+				}
 				edidlen = get_edid(OCNE(&ev)->display, OCNE(&ev)->output, edid, EDID_SIZE);
 				i = get_sid(OCNE(&ev)->display, OCNE(&ev)->output);
 				CONNECTIONS = cache_connection(CONNECTIONS, OCNE(&ev)->output, edid, edidlen, i);
@@ -415,6 +436,7 @@ process_events(Display * dpy, int verbose)
 			emit(dpy, info->name, CON_EVENTS[info->connection], edid, screenid);
 			XRRFreeScreenResources(sr);
 			XRRFreeOutputInfo(info);
+			mode = NULL;
 		}
 	}
 	return EXIT_SUCCESS;
