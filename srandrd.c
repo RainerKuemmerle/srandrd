@@ -226,9 +226,6 @@ iter_crtcs(Display * dpy, void (*f) (Display *, char *, char *, int))
 					f(dpy, info->name, edid, sid);
 					XRRFreeOutputInfo(info);
 				}
-				if (i == sid) {
-					break;
-				}
 			}
 		}
 		XFree(si);
