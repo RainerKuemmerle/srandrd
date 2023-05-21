@@ -14,7 +14,7 @@ INSTALLDIR	:= $(DESTDIR)$(PREFIX)
 MANPREFIX	?= $(PREFIX)/share/man
 MANPREFIX	:= $(DESTDIR)$(MANPREFIX)
 
-CFLAGS		:= -Wall -g -Os -pedantic -std=c99 #-Werror -Wextra
+CFLAGS		:= -Wall -g -O3 -pedantic -std=c99 #-Werror -Wextra
 CPPFLAGS	+= -D_DEFAULT_SOURCE
 CPPFLAGS	+= -DNAME=\"$(TARGET)\" -DVERSION=\"$(VERSION)\"
 CPPFLAGS	+= -DCOPYRIGHT=\"$(COPYRIGHT)\" -DLICENSE=\"$(LICENSE)\"
