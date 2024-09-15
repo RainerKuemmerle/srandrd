@@ -382,7 +382,8 @@ process_events(Display * dpy, int verbose)
 
 			if (strncmp(CON_EVENTS[info->connection], "disconnected", 12) == 0) {
 				if (mode == NULL && !(OCNE(&ev)->mode)) {
-					fprintf(stderr, "Ignoring disconnected event with no mode\n");
+					if (verbose)
+						printf("Ignoring disconnected event with no mode\n");
 					XRRFreeScreenResources(sr);
 					XRRFreeOutputInfo(info);
 					continue;
@@ -398,7 +399,8 @@ process_events(Display * dpy, int verbose)
 			}
 			else {
 				if (mode || OCNE(&ev)->mode) {
-					fprintf(stderr, "Ignoring connected event with mode\n");
+					if (verbose)
+						printf("Ignoring connected event with mode\n");
 					XRRFreeScreenResources(sr);
 					XRRFreeOutputInfo(info);
 					mode = NULL;
